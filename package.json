@@ -1,0 +1,20 @@
+{
+  "name": "nested-default-props",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "vue": "^3.0.0-rc.5"
+  },
+  "devDependencies": {
+    "vite": "^1.0.0-rc.4",
+    "@vue/compiler-sfc": "^3.0.0-rc.5",
+    "@avalanche/eslint-config": "^4.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.6.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-vue": "^7.0.0-beta.2"
+  }
+}
