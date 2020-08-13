@@ -1,5 +1,5 @@
 {
-  "name": "nested-default-props",
+  "name": "vue-nested-default-props",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
