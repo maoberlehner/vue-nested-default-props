@@ -1,13 +1,64 @@
+<template>
+  <slot/>
+</template>
+
 <script>
 import {
-  provide, reactive, ref, toRef, inject, computed,
-} from "vue";
+  computed,
+  inject,
+  provide,
+} from 'vue';
+
+import { asArray } from '../utils/as-array';
+import { breakpoints } from '../config/breakpoints';
+import { isNumber } from '../utils/is-number';
+import { toString } from '../utils/to-string';
+
+const DEFAULT_BREAKPOINT = `default`;
 
 export const WidthProviderSymbol = Symbol(`Width provider identifier`);
 
-const DEFAULT_BREAKPOINT = `default`;
-const asArray = x => [].concat(x);
-const toString = x => `${x}`;
+function useBreakpointWidthsRatios(responsiveWidthOrWidths) {
+  return computed(() => {
+    const breakpointWidthsRatios = {};
+    const responsiveWidths = asArray(responsiveWidthOrWidths);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const responsiveWidth of responsiveWidths) {
+      const [width, breakpoint] = toString(responsiveWidth).split(`@`);
+      breakpointWidthsRatios[breakpoint || DEFAULT_BREAKPOINT] = width;
+    }
+
+    return breakpointWidthsRatios;
+  });
+}
+
+function useBreakpointWidths({ breakpointWidthsRatios, parentBreakpointWidths }) {
+  return computed(() => {
+    const breakpointWidths = {};
+
+    let width = `12/12`;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const breakpoint of Object.keys(breakpoints)) {
+      // If there is no width for a certain breakpoint we assume full
+      // width or the same width as at the previous breakpoint.
+      width = breakpointWidthsRatios.value[breakpoint] || width;
+
+      if (isNumber(width)) {
+        breakpointWidths[breakpoint] = parseInt(width, 10);
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      const [columns, maxColumns] = width.split(`/`).map(x => parseInt(x, 10));
+      const factor = columns / maxColumns;
+
+      breakpointWidths[breakpoint] = Math.round(parentBreakpointWidths.value[breakpoint] * factor);
+    }
+
+    return breakpointWidths;
+  });
+}
 
 export default {
   props: {
@@ -17,32 +68,14 @@ export default {
     },
   },
   setup(props) {
-    // TODO funktioniert das reactive, wenn props.width sich ändert?
-    const widths = asArray(props.width);
-
-    const result = reactive({});
-    widths.forEach((responsiveWidth) => {
-      const [width, breakpoint] = toString(responsiveWidth).split(`@`);
-
-      // TODO normalizen
-      if (isNaN(width)) {
-        const parentWidth = inject(WidthProviderSymbol);
-        const [dividend, divisor] = width.split(`/`).map(x => parseInt(x, 10));
-        const quotient = dividend / divisor;
-        const xxxBreakpoint = breakpoint || DEFAULT_BREAKPOINT;
-        result[xxxBreakpoint] = parentWidth[xxxBreakpoint] * quotient;
-        return;
-      }
-
-      result[breakpoint || DEFAULT_BREAKPOINT] = parseInt(width, 10);
+    const parentBreakpointWidths = inject(WidthProviderSymbol, { [DEFAULT_BREAKPOINT]: 375 });
+    const breakpointWidthsRatios = useBreakpointWidthsRatios(props.width);
+    const breakpointWidths = useBreakpointWidths({
+      breakpointWidthsRatios,
+      parentBreakpointWidths,
     });
 
-    provide(WidthProviderSymbol, result);
-  },
-  render() {
-    // Our provider component is a renderless component
-    // it does not render any markup of its own.
-    return this.$slots.default();
+    provide(WidthProviderSymbol, breakpointWidths);
   },
 };
 </script>
