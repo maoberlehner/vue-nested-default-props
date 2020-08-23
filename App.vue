@@ -35,13 +35,13 @@
 </template>
 
 <script>
-import ProvideBackgroundColor from "./components/ProvideBackgroundColor.vue";
-import ProvideWidth from "./components/ProvideWidth.vue";
-import BaseButton from "./components/BaseButton.vue";
-import BaseGrid from "./components/BaseGrid.vue";
-import BaseGridItem from "./components/BaseGridItem.vue";
-import BaseImage from "./components/BaseImage.vue";
-import BaseIsland from "./components/BaseIsland.vue";
+import ProvideBackgroundColor from './components/ProvideBackgroundColor.vue';
+import ProvideWidth from './components/ProvideWidth.vue';
+import BaseButton from './components/BaseButton.vue';
+import BaseGrid from './components/BaseGrid.vue';
+import BaseGridItem from './components/BaseGridItem.vue';
+import BaseImage from './components/BaseImage.vue';
+import BaseIsland from './components/BaseIsland.vue';
 
 export default {
   components: {
